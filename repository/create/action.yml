@@ -2,6 +2,10 @@
 name: Create repository
 
 inputs:
+  base_path:
+    default: .
+    description: Base path
+    required: false
   el_version:
     description: The EL version ('el_version' + '/' is prepended to 'repo_dirname' & appended to 'image_prefix')
     required: true
@@ -41,11 +45,14 @@ runs:
         IMAGE_PREFIX: ${{ inputs.image_prefix }}${{ inputs.el_version }}/
         MAKEFILES: Makefile.${{ inputs.el_version }}
         REPO_DIR: ${{ inputs.repo_parent_dir }}/${{ inputs.el_version }}/${{ inputs.repo_dirname }}
-      run: >-
-        make rpmbuild-generic &&
-        mkdir --parents ${REPO_DIR} &&
-        cp --verbose ${{ inputs.rpms_dir }}/*/*.rpm ${REPO_DIR}/ &&
-        docker-compose run -v ${REPO_DIR}:${REPO_DIR}:rw -v ${PWD}/scripts:/rpmbuild/scripts:ro -T rpmbuild-generic bash -c "
-          scripts/repo-update.sh ${REPO_DIR}
-        "
+      run: |
+        make rpmbuild-generic
+        mkdir --parents ${REPO_DIR}
+        cp --verbose ${{ inputs.rpms_dir }}/*/*.rpm ${REPO_DIR}/
+        docker-compose run -T \
+          -v ${PWD}/scripts:/rpmbuild/scripts:ro \
+          -v ${REPO_DIR}:${REPO_DIR}:rw \
+          rpmbuild-generic \
+            bash -c "scripts/repo-update.sh ${REPO_DIR}"
       shell: bash --noprofile --norc -euxo pipefail {0}
+      working-directory: ${{ inputs.base_path }}

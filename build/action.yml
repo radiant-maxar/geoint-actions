@@ -2,6 +2,10 @@
 name: Build Image / RPM(s)
 
 inputs:
+  base_path:
+    default: .
+    description: Base path
+    required: false
   download_rpms:
     description: Download RPMS
     required: false
@@ -32,13 +36,14 @@ runs:
       uses: actions/download-artifact@v3
       with:
         name: RPMS-${{ inputs.el_version }}-${{ github.sha }}
-        path: RPMS
+        path: ${{ inputs.base_path }}/RPMS
 
     - name: Get list of pre-existing RPMs
       if: inputs.download_rpms
       run: |
         echo "RPMS=$(find RPMS -type f -name *.rpm | xargs)" >> $GITHUB_ENV
       shell: bash --noprofile --norc -euxo pipefail {0}
+      working-directory: ${{ inputs.base_path }}
 
     - name: Log in to GHCR
       uses: radiant-maxar/geoint-actions/docker/registry-login@v1
@@ -53,6 +58,7 @@ runs:
       run: |
         make ${{ inputs.make_target }}
       shell: bash --noprofile --norc -euxo pipefail {0}
+      working-directory: ${{ inputs.base_path }}
 
     - name: Push `${{ matrix.image }}` to GHCR
       env:
@@ -61,15 +67,17 @@ runs:
       run: |
         docker-compose push ${{ matrix.image }}
       shell: bash --noprofile --norc -euxo pipefail {0}
+      working-directory: ${{ inputs.base_path }}
 
     - name: Remove pre-existing RPMs
       if: inputs.download_rpms
       run: |
         rm --force --verbose ${RPMS}
       shell: bash --noprofile --norc -euxo pipefail {0}
+      working-directory: ${{ inputs.base_path }}
 
     - name: Upload RPMS directory
       uses: actions/upload-artifact@v3
       with:
         name: RPMS-${{ inputs.el_version }}-${{ github.sha }}
-        path: RPMS
+        path: ${{ inputs.base_path }}/RPMS
