@@ -43,10 +43,9 @@ runs:
       env:
         COMPOSE_FILE: docker-compose.${{ inputs.el_version }}.yml
         IMAGE_PREFIX: ${{ inputs.image_prefix }}${{ inputs.el_version }}/
-        MAKEFILES: Makefile.${{ inputs.el_version }}
         REPO_DIR: ${{ inputs.repo_parent_dir }}/${{ inputs.el_version }}/${{ inputs.repo_dirname }}
       run: |
-        make rpmbuild-generic
+        make --makefile=Makefile.${{ inputs.el_version }} rpmbuild-generic
         mkdir --parents ${REPO_DIR}
         cp --verbose ${{ inputs.rpms_dir }}/*/*.rpm ${REPO_DIR}/
         docker-compose run -T \

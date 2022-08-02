@@ -54,9 +54,8 @@ runs:
       env:
         COMPOSE_FILE: docker-compose.${{ inputs.el_version }}.yml
         IMAGE_PREFIX: ${{ inputs.image_prefix }}${{ inputs.el_version }}/
-        MAKEFILES: Makefile.${{ inputs.el_version }}
       run: |
-        make ${{ inputs.make_target }}
+        make --makefile=Makefile.${{ inputs.el_version }} ${{ inputs.make_target }}
       shell: bash --noprofile --norc -euxo pipefail {0}
       working-directory: ${{ inputs.base_path }}
 
