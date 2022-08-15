@@ -26,17 +26,22 @@ inputs:
   push_image:
     description: Push image
     required: false
+  upload_rpms:
+    default: true
+    description: Upload RPMS
+    required: false
 
 runs:
   using: composite
 
   steps:
-    - name: Download RPMS directory
+    - name: Download RPMS artifact
       if: inputs.download_rpms
-      uses: actions/download-artifact@v3
+      uses: radiant-maxar/geoint-actions/artifact/download@v1.1
       with:
-        name: RPMS-${{ inputs.el_version }}-${{ github.sha }}
-        path: ${{ inputs.base_path }}/RPMS
+        base_path: ${{ inputs.base_path }}
+        directory: RPMS
+        el_version: ${{ inputs.el_version }}
 
     - name: Get list of pre-existing RPMs
       if: inputs.download_rpms
@@ -46,7 +51,7 @@ runs:
       working-directory: ${{ inputs.base_path }}
 
     - name: Log in to GHCR
-      uses: radiant-maxar/geoint-actions/docker/registry-login@v1
+      uses: radiant-maxar/geoint-actions/docker/registry-login@v1.1
       with:
         server: ${{ inputs.image_registry }}
 
@@ -75,8 +80,10 @@ runs:
       shell: bash --noprofile --norc -euxo pipefail {0}
       working-directory: ${{ inputs.base_path }}
 
-    - name: Upload RPMS directory
-      uses: actions/upload-artifact@v3
+    - name: Upload RPMS artifact
+      if: inputs.upload_rpms
+      uses: radiant-maxar/geoint-actions/artifact/upload@v1.1
       with:
-        name: RPMS-${{ inputs.el_version }}-${{ github.sha }}
-        path: ${{ inputs.base_path }}/RPMS
+        base_path: ${{ inputs.base_path }}
+        directory: RPMS
+        el_version: ${{ inputs.el_version }}

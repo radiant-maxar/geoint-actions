@@ -1,0 +1,29 @@
+---
+name: Download artifact
+
+inputs:
+  base_path:
+    description: Base path
+    required: true
+  directory:
+    description: The artifact directory
+    required: true
+  el_version:
+    description: The EL version
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Set artifact name
+      id: set-artifact-name
+      uses: radiant-maxar/geoint-actions/artifact/set-name@v1.1
+      with:
+        el_version: ${{ inputs.el_version }}
+
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ inputs.directory }}.${{ steps.set-artifact-name.outputs.artifact-name }}
+        path: ${{ inputs.base_path }}/${{ inputs.directory }}

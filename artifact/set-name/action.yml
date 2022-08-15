@@ -1,0 +1,23 @@
+---
+name: Set artifact name
+
+inputs:
+  el_version:
+    description: The EL version
+    required: true
+
+outputs:
+  artifact-name:
+    description: Artifact name
+    value: ${{ steps.set-artifact-name.outputs.artifact-name }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Set artifact name
+      id: set-artifact-name
+      run: |
+        REPO_NAME="$(echo '${{ github.repository }}' | sed 's#^${{ github.repository_owner }}/##')"
+        echo "::set-output name=artifact-name::${REPO_NAME}.${{ inputs.el_version }}.${{ github.sha }}"
+      shell: bash --noprofile --norc -euxo pipefail {0}
