@@ -19,5 +19,5 @@ runs:
       id: set-artifact-name
       run: |
         REPO_NAME="$(echo '${{ github.repository }}' | sed 's#^${{ github.repository_owner }}/##')"
-        echo "::set-output name=artifact-name::${REPO_NAME}.${{ inputs.el_version }}.${{ github.sha }}"
+        echo "artifact-name=${REPO_NAME}.${{ inputs.el_version }}.${{ github.sha }}" >> $GITHUB_OUTPUT
       shell: bash --noprofile --norc -euxo pipefail {0}

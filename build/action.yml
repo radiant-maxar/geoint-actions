@@ -37,7 +37,7 @@ runs:
   steps:
     - name: Download RPMS artifact
       if: inputs.download_rpms
-      uses: radiant-maxar/geoint-actions/artifact/download@v1.1
+      uses: radiant-maxar/geoint-actions/artifact/download@v1.2
       with:
         base_path: ${{ inputs.base_path }}
         directory: RPMS
@@ -51,7 +51,7 @@ runs:
       working-directory: ${{ inputs.base_path }}
 
     - name: Log in to GHCR
-      uses: radiant-maxar/geoint-actions/docker/registry-login@v1.1
+      uses: radiant-maxar/geoint-actions/docker/registry-login@v1.2
       with:
         server: ${{ inputs.image_registry }}
 
@@ -82,7 +82,7 @@ runs:
 
     - name: Upload RPMS artifact
       if: inputs.upload_rpms
-      uses: radiant-maxar/geoint-actions/artifact/upload@v1.1
+      uses: radiant-maxar/geoint-actions/artifact/upload@v1.2
       with:
         base_path: ${{ inputs.base_path }}
         directory: RPMS
